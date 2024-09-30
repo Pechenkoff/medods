@@ -1,0 +1,12 @@
+port: "8080"
+timeouts:
+  write: 10
+  read: 5
+  idle: 15
+jwt_secret: "medods_jwt"
+database:
+  user: "user"
+  password: "password"
+  host: "localhost"
+  port: "5432"
+  dbname: "medods"
