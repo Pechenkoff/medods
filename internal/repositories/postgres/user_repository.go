@@ -20,14 +20,14 @@ func NewUserRepository(db *pgx.Conn) repositories.UserRepository {
 }
 
 // StroreRefreshToken - create a new user token and save it in PostgreSQL
-func (r *userRepository) StoreRefreshToken(userID, ip, refreshToken string) error {
+func (r *userRepository) StoreRefreshToken(userID, ip, refreshToken, email string) error {
 	hashedToken, err := bcrypt.GenerateFromPassword([]byte(refreshToken), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 
-	query := `INSERT INTO users (id, hashed_token, ip) VALUES ($1, $2, $3)`
-	_, err = r.db.Exec(context.Background(), query, userID, hashedToken, ip)
+	query := `INSERT INTO users (id, email, hashed_token, ip) VALUES ($1, $2, $3, $4)`
+	_, err = r.db.Exec(context.Background(), query, userID, email, hashedToken, ip)
 	if err != nil {
 		return nil
 	}
@@ -47,14 +47,14 @@ func (r *userRepository) VerifyRefreshToken(userID, refreshToken string) (bool, 
 	return bcrypt.CompareHashAndPassword([]byte(hashedToken), []byte(refreshToken)) == nil, nil
 }
 
-// VerifyIP - check a IP
-func (r *userRepository) VerifyIP(userID, ip string) (bool, error) {
-	var ipOld string
-	query := `SELECT ip FROM users WHERE id = $1`
-	err := r.db.QueryRow(context.Background(), query, userID).Scan(&ipOld)
+// VerifyIP - check a IP, if not true return email, else return empty string
+func (r *userRepository) VerifyIP(userID, ip string) (bool, string, error) {
+	var ipOld, email string
+	query := `SELECT ip, email FROM users WHERE id = $1`
+	err := r.db.QueryRow(context.Background(), query, userID).Scan(&ipOld, &email)
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
 
-	return ipOld == ip, nil
+	return ip == ipOld, email, nil
 }

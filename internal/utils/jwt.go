@@ -17,12 +17,14 @@ type JWTUtils interface {
 	ParseJWT(tokenString string) (*entities.UserClaims, error)
 }
 
+// NewJWTUtils - create a new copy of JWTUtils
 func NewJWTUtils(secret string) JWTUtils {
 	return &jwtUtils{
 		secret: secret,
 	}
 }
 
+// GenerateAccessToken - generate a new JWT token which is depend of user_id and ip
 func (u *jwtUtils) GenerateAccessToken(userID, ip string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
@@ -34,6 +36,7 @@ func (u *jwtUtils) GenerateAccessToken(userID, ip string) (string, error) {
 	return token.SignedString([]byte(u.secret))
 }
 
+// ParseJWT - parse information from jwt
 func (u *jwtUtils) ParseJWT(tokenString string) (*entities.UserClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &entities.UserClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
