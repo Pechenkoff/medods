@@ -10,8 +10,8 @@ import (
 )
 
 type authService struct {
-	userRepo  repositories.UserRepository
-	jwtSecret string
+	userRepo repositories.UserRepository
+	jwtUtils utils.JWTUtils
 }
 
 type AuthService interface {
@@ -22,14 +22,14 @@ type AuthService interface {
 // NewAuthService - create a new copy of service
 func NewAuthService(jwtSecret string, userRepo repositories.UserRepository) AuthService {
 	return &authService{
-		userRepo:  userRepo,
-		jwtSecret: jwtSecret,
+		userRepo: userRepo,
+		jwtUtils: utils.NewJWTUtils(jwtSecret),
 	}
 }
 
 // GenerateTokens - create a pair of refresh and access token
 func (s *authService) GenerateTokens(userID, ipAddress string) (*entities.TokenPair, error) {
-	accessToken, err := utils.GenerateAccessToken(userID, ipAddress, s.jwtSecret)
+	accessToken, err := s.jwtUtils.GenerateAccessToken(userID, ipAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (s *authService) RefreshTokens(userID, oldRefreshToken, ipAddress string) (
 	}
 
 	if !valid {
-		return nil, fmt.Errorf("uncalid token")
+		return nil, fmt.Errorf("unvalid token")
 	}
 
 	return s.GenerateTokens(userID, ipAddress)
