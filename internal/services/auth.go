@@ -1,34 +1,42 @@
 package services
 
 import (
+	"encoding/json"
 	"fmt"
-	"medods/internal/config"
 	"medods/internal/entities"
+	kafka "medods/internal/infrustructure/kafka/producer"
 	"medods/internal/repositories"
 	"medods/internal/utils"
 
 	"github.com/google/uuid"
 )
 
-type authService struct {
-	userRepo   repositories.UserRepository
-	jwtUtils   utils.JWTUtils
-	emailUtils utils.EmailUtils
-	email      string
+// Message - structure of message to kafka
+type Message struct {
+	Email   string `json:"email"`
+	Subject string `json:"subject"`
+	Message string `json:"message"`
 }
 
+// authService is a structure, which help to realize a AuthService interface
+type authService struct {
+	userRepo repositories.UserRepository
+	jwtUtils utils.JWTUtils
+	producer kafka.Producer
+}
+
+// AuthService is a interface, which presents auth service
 type AuthService interface {
 	GenerateTokens(userID, ipAddress, email string) (*entities.TokenPair, error)
 	RefreshTokens(accessToken, refreshToken string) (*entities.TokenPair, error)
 }
 
 // NewAuthService - create a new copy of service
-func NewAuthService(jwtSecret string, userRepo repositories.UserRepository, emailSMTP config.EmailConfig) AuthService {
+func NewAuthService(jwtSecret string, userRepo repositories.UserRepository, producer kafka.Producer) AuthService {
 	return &authService{
-		userRepo:   userRepo,
-		jwtUtils:   utils.NewJWTUtils(jwtSecret),
-		emailUtils: utils.NewEmailUtils(emailSMTP.SMTPHost, emailSMTP.SMTPUsername, emailSMTP.SMTPPassword, emailSMTP.SMTPPort),
-		email:      emailSMTP.SMTPUsername + "@mail.com",
+		userRepo: userRepo,
+		jwtUtils: utils.NewJWTUtils(jwtSecret),
+		producer: producer,
 	}
 }
 
@@ -64,7 +72,7 @@ func (s *authService) RefreshTokens(acccessToken, refreshToken string) (*entitie
 	}
 
 	if !valid {
-		return nil, fmt.Errorf("unvalid token")
+		return nil, fmt.Errorf("invalid token")
 	}
 
 	ok, email, err := s.userRepo.VerifyIP(userClaims.ID, userClaims.IP)
@@ -73,13 +81,21 @@ func (s *authService) RefreshTokens(acccessToken, refreshToken string) (*entitie
 	}
 
 	if !ok {
-		emailMessage := entities.EmailRequest{
-			From:    s.email,
-			To:      email,
+		message := Message{
+			Email:   email,
 			Subject: "Is it you?",
-			Body:    fmt.Sprintf("Is it your IP: %s", userClaims.IP),
+			Message: fmt.Sprintf("We are see that some one trying to login with your credentials from this ip: %v, is it you?", userClaims.IP),
 		}
-		s.emailUtils.SendEmail(emailMessage)
+
+		msgByte, err := json.Marshal(message)
+		if err != nil {
+			return nil, err
+		}
+
+		err = s.producer.SendMessage("change ip email", msgByte)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return s.GenerateTokens(userClaims.ID, userClaims.IP, email)
