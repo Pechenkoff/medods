@@ -11,7 +11,7 @@ type Config struct {
 	JWTSecret string         `mapstructure:"jwt_secret"`
 	Database  DBConfig       `mapstructure:"database"`
 	Timeouts  ServerTimeouts `mapstructure:"timeouts"`
-	Email     EmailConfig    `mapstructure:"email"`
+	Kafka     KafkaConfig    `mapstructure:"kafka"`
 }
 
 type DBConfig struct {
@@ -28,11 +28,8 @@ type ServerTimeouts struct {
 	IdleTimeout  int `mapstructure:"idle"`
 }
 
-type EmailConfig struct {
-	SMTPHost     string `mapstructure:"smtp_host"`
-	SMTPPort     int    `mapstructure:"smtp_port"`
-	SMTPUsername string `mapstructure:"smtp_username"`
-	SMTPPassword string `mapstructure:"smtp_password"`
+type KafkaConfig struct {
+	Providers string `mapstrusture:"providers"`
 }
 
 func MustLoadConfig(filepath string) *Config {

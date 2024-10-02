@@ -1,4 +1,4 @@
-port: "8080"
+port: ":8080"
 timeouts:
   write: 10
   read: 5
@@ -10,8 +10,5 @@ database:
   host: "localhost"
   port: "5432"
   dbname: "medods"
-mail:
-  smtp_host: "stmp.somehost.com"
-  smtp_port: 587
-  smtp_username: "somefakeemail"
-  smtp_password: "fakepassword"
+kafka:
+  providers: localhost:9092
