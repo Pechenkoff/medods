@@ -27,7 +27,7 @@ const docTemplate = `{
                 "tags": [
                     "auth"
                 ],
-                "summary": "Get pair of access and refresh tokens by GUID and email",
+                "summary": "Generate pair of access and refresh tokens by GUID and email",
                 "parameters": [
                     {
                         "description": "Body of request with GUID and email",
@@ -63,7 +63,7 @@ const docTemplate = `{
         },
         "/refresh": {
             "post": {
-                "description": "Get a pair of access and refresh token, decifer access token get user GUID, check a refresh token and if all is ok return pair of access and refresh tokens",
+                "description": "Generate a pair of access and refresh token, decifer access token get user GUID, check a refresh token and if all is ok return pair of access and refresh tokens",
                 "consumes": [
                     "application/json"
                 ],

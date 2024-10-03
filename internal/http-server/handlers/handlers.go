@@ -33,7 +33,7 @@ func NewAuthHandlers(logger *slog.Logger, services services.AuthService) AuthHan
 }
 
 // AccessHandler godoc
-// @Summary Get pair of access and refresh tokens by GUID and email
+// @Summary Generate pair of access and refresh tokens by GUID and email
 // @Description Retern a pair of access and refresh tokens by GUID and email
 // @Tags auth
 // @Accept json
@@ -82,7 +82,7 @@ func (h *authHandlers) AccessHandler(ctx *gin.Context) {
 
 // RefreshHandler godoc
 // @Summary Get a new pair of access and refresh tokens
-// @Description Get a pair of access and refresh token, decifer access token get user GUID, check a refresh token and if all is ok return pair of access and refresh tokens
+// @Description Generate a pair of access and refresh token, decifer access token get user GUID, check a refresh token and if all is ok return pair of access and refresh tokens
 // @Tags auth
 // @Accept json
 // @Produce json
