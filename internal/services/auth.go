@@ -28,7 +28,7 @@ type authService struct {
 // AuthService is a interface, which presents auth service
 type AuthService interface {
 	GenerateTokens(userID, ipAddress, email string) (*entities.TokenPair, error)
-	RefreshTokens(accessToken, refreshToken string) (*entities.TokenPair, error)
+	RefreshTokens(accessToken, refreshToken, userIP string) (*entities.TokenPair, error)
 }
 
 // NewAuthService - create a new copy of service
@@ -60,7 +60,7 @@ func (s *authService) GenerateTokens(userID, ipAddress, email string) (*entities
 }
 
 // RefreshTokens - realise a refresh operation
-func (s *authService) RefreshTokens(acccessToken, refreshToken string) (*entities.TokenPair, error) {
+func (s *authService) RefreshTokens(acccessToken, refreshToken, userIP string) (*entities.TokenPair, error) {
 	userClaims, err := s.jwtUtils.ParseJWT(acccessToken)
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func (s *authService) RefreshTokens(acccessToken, refreshToken string) (*entitie
 		return nil, fmt.Errorf("invalid token")
 	}
 
-	ok, email, err := s.userRepo.VerifyIP(userClaims.ID, userClaims.IP)
+	ok, email, err := s.userRepo.VerifyIP(userClaims.ID, userIP)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (s *authService) RefreshTokens(acccessToken, refreshToken string) (*entitie
 		message := Message{
 			Email:   email,
 			Subject: "Is it you?",
-			Message: fmt.Sprintf("We are see that some one trying to login with your credentials from this ip: %v, is it you?", userClaims.IP),
+			Message: fmt.Sprintf("We are see that some one trying to login with your credentials from this ip: %v, is it you?", userIP),
 		}
 
 		msgByte, err := json.Marshal(message)
@@ -98,5 +98,5 @@ func (s *authService) RefreshTokens(acccessToken, refreshToken string) (*entitie
 		}
 	}
 
-	return s.GenerateTokens(userClaims.ID, userClaims.IP, email)
+	return s.GenerateTokens(userClaims.ID, userIP, email)
 }

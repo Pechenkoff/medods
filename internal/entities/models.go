@@ -16,7 +16,6 @@ type TokenPair struct {
 
 type UserClaims struct {
 	ID string `json:"user_id"`
-	IP string `json:"ip"`
 	jwt.StandardClaims
 }
 

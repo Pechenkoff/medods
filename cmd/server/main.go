@@ -21,6 +21,11 @@ import (
 
 	"github.com/IBM/sarama"
 	"github.com/jackc/pgx/v5"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "medods/docs"
+
+	swaggerFiles "github.com/swaggo/files"
 )
 
 // go run ./cmd/server/main.go -config=./config/config.yaml -migration=file://./db/migrations
@@ -69,12 +74,15 @@ func main() {
 	router := routes.NewRouter()
 	router.SetupRouter(handlers)
 
+	// set up swagger
+	router.Engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	server := http.Server{
 		Addr:         cfg.Port,
 		Handler:      router.Engine,
-		WriteTimeout: time.Duration(cfg.Timeouts.WriteTimeout),
-		ReadTimeout:  time.Duration(cfg.Timeouts.ReadTimeout),
-		IdleTimeout:  time.Duration(cfg.Timeouts.IdleTimeout),
+		WriteTimeout: time.Duration(cfg.Timeouts.WriteTimeout) * time.Second,
+		ReadTimeout:  time.Duration(cfg.Timeouts.ReadTimeout) * time.Second,
+		IdleTimeout:  time.Duration(cfg.Timeouts.IdleTimeout) * time.Second,
 	}
 
 	// realize a gracefull shutdown

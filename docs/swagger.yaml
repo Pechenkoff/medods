@@ -1,0 +1,106 @@
+definitions:
+  models.AccessRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      user_id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+    type: object
+  models.ErrorResponse400:
+    properties:
+      error:
+        example: bad request
+        type: string
+    type: object
+  models.ErrorResponse500:
+    properties:
+      error:
+        example: internal server error
+        type: string
+    type: object
+  models.RefreshRequest:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTIzZDU2NyIsImV4cCI6MTYzMjU3MjAwMCwiaWF0IjoxNjMyNTY4NDAwfQ.d6l5N1dlv8HHSX3aWcyhnSY7OLqZ_Px4dUlYVt5yXy_o1s0hD-Gy2GqqP6lVRcCqKbl-dfxRmXhyyQHqt8RThQ
+        type: string
+      refresh_token:
+        example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        type: string
+    type: object
+  models.Response:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTIzZDU2NyIsImV4cCI6MTYzMjU3MjAwMCwiaWF0IjoxNjMyNTY4NDAwfQ.d6l5N1dlv8HHSX3aWcyhnSY7OLqZ_Px4dUlYVt5yXy_o1s0hD-Gy2GqqP6lVRcCqKbl-dfxRmXhyyQHqt8RThQ
+        type: string
+      refresh_token:
+        example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /access:
+    post:
+      consumes:
+      - application/json
+      description: Retern a pair of access and refresh tokens by GUID and email
+      parameters:
+      - description: Body of request with GUID and email
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.AccessRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse400'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse500'
+      summary: Get pair of access and refresh tokens by GUID and email
+      tags:
+      - auth
+  /refresh:
+    post:
+      consumes:
+      - application/json
+      description: Get a pair of access and refresh token, decifer access token get
+        user GUID, check a refresh token and if all is ok return pair of access and
+        refresh tokens
+      parameters:
+      - description: Body request with access and refresh token
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse400'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse500'
+      summary: Get a new pair of access and refresh tokens
+      tags:
+      - auth
+swagger: "2.0"

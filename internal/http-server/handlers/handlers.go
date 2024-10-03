@@ -32,7 +32,17 @@ func NewAuthHandlers(logger *slog.Logger, services services.AuthService) AuthHan
 	}
 }
 
-// AccessHandler - is a handler which generate new pair of access and refresh token and put them into cookie
+// AccessHandler godoc
+// @Summary Get pair of access and refresh tokens by GUID and email
+// @Description Retern a pair of access and refresh tokens by GUID and email
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param body body models.AccessRequest true "Body of request with GUID and email"
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.ErrorResponse400
+// @Failure 500 {object} models.ErrorResponse500
+// @Router /access [post]
 func (h *authHandlers) AccessHandler(ctx *gin.Context) {
 	var req models.AccessRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -70,7 +80,17 @@ func (h *authHandlers) AccessHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-// RefreshHandler - is a hadnler, which check a refresh token and if all is ok return token pair
+// RefreshHandler godoc
+// @Summary Get a new pair of access and refresh tokens
+// @Description Get a pair of access and refresh token, decifer access token get user GUID, check a refresh token and if all is ok return pair of access and refresh tokens
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param body body models.RefreshRequest true "Body request with access and refresh token"
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.ErrorResponse400
+// @Failure 500 {object} models.ErrorResponse500
+// @Router /refresh [post]
 func (h *authHandlers) RefreshHanadler(ctx *gin.Context) {
 	var req models.RefreshRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -81,7 +101,9 @@ func (h *authHandlers) RefreshHanadler(ctx *gin.Context) {
 		return
 	}
 
-	pairToken, err := h.services.RefreshTokens(req.AccessToken, req.RefreshToken)
+	userIP := ctx.ClientIP()
+
+	pairToken, err := h.services.RefreshTokens(req.AccessToken, req.RefreshToken, userIP)
 	if err != nil {
 		if errors.Is(err, errors.New("invalid token")) {
 			h.logger.Warn("Expired refresh token")

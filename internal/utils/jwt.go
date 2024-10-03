@@ -28,7 +28,6 @@ func NewJWTUtils(secret string) JWTUtils {
 func (u *jwtUtils) GenerateAccessToken(userID, ip string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
-		"ip":      ip,
 		"exp":     time.Now().Add(time.Minute * 15).Unix(),
 	}
 
