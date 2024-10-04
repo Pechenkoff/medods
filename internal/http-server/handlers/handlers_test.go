@@ -15,6 +15,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestAccessHandler(t *testing.T) {
@@ -56,9 +57,9 @@ func TestAccessHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockService := new(mocks.AuthService)
-			if tt.mockReturn != nil {
-				mockService.On("GenerateTokens", tt.body.GUID, "mock.Anything", tt.body.Email).Return(tt.mockReturn, tt.mockError)
+			mockService := mocks.NewAuthService(t)
+			if tt.name != "bad email format" {
+				mockService.On("GenerateTokens", tt.body.GUID, mock.Anything, tt.body.Email).Return(tt.mockReturn, tt.mockError)
 			}
 
 			handler := handlers.NewAuthHandlers(slogdiscard.NewDiscardLogger(), mockService)

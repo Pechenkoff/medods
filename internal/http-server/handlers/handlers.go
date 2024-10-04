@@ -63,13 +63,6 @@ func (h *authHandlers) AccessHandler(ctx *gin.Context) {
 
 	clientIP := ctx.ClientIP()
 
-	if clientIP == "" {
-		h.logger.Error("empty client IP", "GUID", req.GUID)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "bad request",
-		})
-	}
-
 	pairToken, err := h.services.GenerateTokens(req.GUID, clientIP, req.Email)
 	if err != nil {
 		h.logger.Error("failed generate a token pair", sl.Err(err))
