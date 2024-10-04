@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"errors"
+	"fmt"
 	"log/slog"
 	"medods/internal/http-server/models"
 	"medods/internal/infrustructure/logger/sl"
@@ -105,7 +105,7 @@ func (h *authHandlers) RefreshHanadler(ctx *gin.Context) {
 
 	pairToken, err := h.services.RefreshTokens(req.AccessToken, req.RefreshToken, userIP)
 	if err != nil {
-		if errors.Is(err, errors.New("invalid token")) {
+		if err.Error() == fmt.Errorf("invalid token").Error() {
 			h.logger.Warn("Expired refresh token")
 			ctx.JSON(http.StatusUnauthorized, gin.H{
 				"error": "expired refresh token",

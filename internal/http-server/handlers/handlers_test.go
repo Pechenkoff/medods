@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"medods/internal/entities"
 	"medods/internal/http-server/handlers"
 	"medods/internal/http-server/handlers/mocks"
@@ -109,7 +110,7 @@ func TestRefreshHandler(t *testing.T) {
 			name:             "bad token",
 			body:             models.RefreshRequest{AccessToken: "access_token", RefreshToken: "refresh_token"},
 			mockReturn:       nil,
-			mockError:        errors.New("invalid token"),
+			mockError:        fmt.Errorf("invalid token"),
 			expectedCode:     http.StatusUnauthorized,
 			expectedResponse: map[string]interface{}{"error": "expired refresh token"},
 		},
