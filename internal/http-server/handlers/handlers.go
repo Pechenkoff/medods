@@ -117,6 +117,7 @@ func (h *authHandlers) RefreshHanadler(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "internal server error",
 		})
+		return
 	}
 
 	responce := models.Response{
