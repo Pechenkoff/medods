@@ -32,17 +32,17 @@ type AuthService interface {
 }
 
 // NewAuthService - create a new copy of service
-func NewAuthService(jwtSecret string, userRepo repositories.UserRepository, producer kafka.Producer) AuthService {
+func NewAuthService(jwtUtils utils.JWTUtils, userRepo repositories.UserRepository, producer kafka.Producer) AuthService {
 	return &authService{
 		userRepo: userRepo,
-		jwtUtils: utils.NewJWTUtils(jwtSecret),
+		jwtUtils: jwtUtils,
 		producer: producer,
 	}
 }
 
 // GenerateTokens - create a pair of refresh and access token
 func (s *authService) GenerateTokens(userID, ipAddress, email string) (*entities.TokenPair, error) {
-	accessToken, err := s.jwtUtils.GenerateAccessToken(userID, ipAddress)
+	accessToken, err := s.jwtUtils.GenerateAccessToken(userID)
 	if err != nil {
 		return nil, err
 	}

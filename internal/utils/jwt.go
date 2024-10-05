@@ -13,7 +13,7 @@ type jwtUtils struct {
 }
 
 type JWTUtils interface {
-	GenerateAccessToken(userID, ip string) (string, error)
+	GenerateAccessToken(userID string) (string, error)
 	ParseJWT(tokenString string) (*entities.UserClaims, error)
 }
 
@@ -25,7 +25,7 @@ func NewJWTUtils(secret string) JWTUtils {
 }
 
 // GenerateAccessToken - generate a new JWT token which is depend of user_id and ip
-func (u *jwtUtils) GenerateAccessToken(userID, ip string) (string, error) {
+func (u *jwtUtils) GenerateAccessToken(userID string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
 		"exp":     time.Now().Add(time.Minute * 15).Unix(),

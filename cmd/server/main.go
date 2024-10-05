@@ -13,6 +13,7 @@ import (
 	"medods/internal/infrustructure/logger/sl"
 	"medods/internal/repositories/postgres"
 	"medods/internal/services"
+	"medods/internal/utils"
 	"net/http"
 	"os"
 	"os/signal"
@@ -64,8 +65,10 @@ func main() {
 		panic("failed create kafka producer")
 	}
 
+	//create a copy of jwt utils
+	jwtUtils := utils.NewJWTUtils(cfg.JWTSecret)
 	// create a auth services copy
-	services := services.NewAuthService(cfg.JWTSecret, userRepo, producer)
+	services := services.NewAuthService(jwtUtils, userRepo, producer)
 
 	// create a handlers copy
 	handlers := handlers.NewAuthHandlers(logger, services)
