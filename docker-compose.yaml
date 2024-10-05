@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:latest
-    container_name: postgres_container
+    container_name: postgres
     restart: always
     environment:
       POSTGRES_USER: user
@@ -23,7 +23,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     volumes:
-      - ~/home/pechenkoff/ai_sorcer/BD/kafka/volumes/zookeeper:/zookeeper_data
+      - ./data:/var/lib/kafka/volumes/zookeeper:/zookeeper_data
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "2181"]
       interval: 30s
@@ -38,11 +38,11 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     volumes:
-      - ~/home/pechenkoff/ai_sorcer/BD/kafka/volumes/kafka:/kafka_data
+      - ./data:/var/lib//kafka/volumes/kafka:/kafka_data
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - zookeeper
@@ -52,21 +52,22 @@ services:
       timeout: 10s
       retries: 5
       
-  # go-server:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   container_name: go_server
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - postgres
-  #     - kafka
-  #   volumes:
-  #     - ./config:/app/config
-  #     - ./db/migrations:/app/db/migrations
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
+  go-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go_server
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - kafka
+    volumes:
+      - ./config:/app/config
+      - ./db/migrations:/app/db/migrations
+    command: ["dockerize", "-wait", "tcp://kafka:9092", "-timeout", "60s", "--", "/app/server", "-config=./config/config.yaml", "-migration=file://./db/migrations"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5

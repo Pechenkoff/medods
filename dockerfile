@@ -14,7 +14,10 @@ FROM ubuntu:22.04
 
 WORKDIR /app
 
-RUN apt-get update
+RUN apt-get update && \
+apt-get install -y curl && \
+curl -L https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz | tar -C /usr/local/bin -xz
+
 
 COPY --from=builder /app/server /app/server
 
