@@ -1,7 +1,9 @@
 package services_test
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"medods/internal/entities"
 	"medods/internal/services"
 	"medods/internal/services/mocks"
@@ -66,5 +68,63 @@ func TestGenerateToken(t *testing.T) {
 }
 
 func TestRefreshTokens(t *testing.T) {
+	tests := []struct {
+		name                  string
+		mockJWTUtilsReturn    *entities.UserClaims
+		mockJWTUtilsError     error
+		mockVerifyTokenReturn bool
+		mockVerifyTokenError  error
+		mockVerifyIPReturn    bool
+		mockVerifyIPString    string
+		mockVerifyIPError     error
+		mockSendMessageError  error
+		expectedReturn        *entities.TokenPair
+		expectedError         error
+	}{
+		{
+			name:                  "Success, but not pass verify IP",
+			mockJWTUtilsReturn:    &entities.UserClaims{ID: "user_id"},
+			mockJWTUtilsError:     nil,
+			mockVerifyTokenReturn: true,
+			mockVerifyTokenError:  nil,
+			mockVerifyIPReturn:    false,
+			mockVerifyIPString:    "email",
+			mockVerifyIPError:     nil,
+			mockSendMessageError:  nil,
+			expectedReturn:        &entities.TokenPair{AccessToken: "access_token", RefreshToken: string(mock.AnythingOfType("string"))},
+			expectedError:         nil,
+		},
+	}
 
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockJWTUtils := mocks.NewJWTUtils(t)
+			mockProducer := mocks.NewProducer(t)
+			mockRepo := mocks.NewUserRepository(t)
+			mockRepo.On("VerifyRefreshToken", "user_id", mock.Anything).Return(tt.mockVerifyTokenReturn, tt.mockVerifyTokenError)
+			mockRepo.On("VerifyIP", "user_id", "ip").Return(tt.mockVerifyIPReturn, tt.mockVerifyIPString, tt.mockVerifyIPError)
+
+			message := services.Message{
+				Email:   "email",
+				Subject: "Is it you?",
+				Message: fmt.Sprintf("We are see that some one trying to login with your credentials from this ip: %v, is it you?", "ip"),
+			}
+
+			msgByte, _ := json.Marshal(message)
+
+			mockProducer.On("SendMessage", "change ip email", msgByte).Return(tt.mockSendMessageError)
+
+			mockJWTUtils.On("ParseJWT", "access_token").Return(tt.mockJWTUtilsReturn, tt.mockJWTUtilsError)
+
+			mockJWTUtils.On("GenerateAccessToken", "user_id").Return(tt.expectedReturn.AccessToken, nil)
+
+			mockRepo.On("StoreRefreshToken", "user_id", mock.AnythingOfType("string"), "ip", "email").Return(nil)
+
+			service := services.NewAuthService(mockJWTUtils, mockRepo, mockProducer)
+			tokenpair, err := service.RefreshTokens("access_token", "refresh_token", "ip")
+
+			assert.Equal(t, tt.expectedError, err)
+			assert.Equal(t, tt.expectedReturn.AccessToken, tokenpair.AccessToken)
+		})
+	}
 }

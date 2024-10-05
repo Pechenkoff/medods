@@ -52,21 +52,21 @@ services:
       timeout: 10s
       retries: 5
       
-  go-server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: go_server
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-      - kafka
-    volumes:
-      - ./config:/app/config
-      - ./db/migrations:/app/db/migrations
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+  # go-server:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: go_server
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - postgres
+  #     - kafka
+  #   volumes:
+  #     - ./config:/app/config
+  #     - ./db/migrations:/app/db/migrations
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
