@@ -15,10 +15,10 @@ type RefreshRequest struct {
 	RefreshToken string `json:"refresh_token" example:"f47ac10b-58cc-4372-a567-0e02b2c3d479"`
 }
 
-type ErrorResponse400 struct {
+type BadRequestResponse struct {
 	Error string `json:"error" example:"bad request"`
 }
 
-type ErrorResponse500 struct {
+type ServerErrorResponse struct {
 	Error string `json:"error" example:"internal server error"`
 }

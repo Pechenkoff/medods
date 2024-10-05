@@ -49,13 +49,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse400"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse500"
+                            "$ref": "#/definitions/models.ServerErrorResponse"
                         }
                     }
                 }
@@ -95,13 +95,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse400"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse500"
+                            "$ref": "#/definitions/models.ServerErrorResponse"
                         }
                     }
                 }
@@ -122,21 +122,12 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ErrorResponse400": {
+        "models.BadRequestResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
                     "example": "bad request"
-                }
-            }
-        },
-        "models.ErrorResponse500": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "internal server error"
                 }
             }
         },
@@ -163,6 +154,15 @@ const docTemplate = `{
                 "refresh_token": {
                     "type": "string",
                     "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                }
+            }
+        },
+        "models.ServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "internal server error"
                 }
             }
         }

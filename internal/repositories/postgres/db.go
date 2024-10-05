@@ -10,7 +10,7 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-// RunMigration - do migration for PostgreSQL
+// MustRunMigration - do migration for PostgreSQL
 func MustRunMigration(dbURL, migrationPath string) {
 	db, err := sql.Open("pgx", dbURL)
 	if err != nil {

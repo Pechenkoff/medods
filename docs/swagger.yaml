@@ -8,16 +8,10 @@ definitions:
         example: 123e4567-e89b-12d3-a456-426614174000
         type: string
     type: object
-  models.ErrorResponse400:
+  models.BadRequestResponse:
     properties:
       error:
         example: bad request
-        type: string
-    type: object
-  models.ErrorResponse500:
-    properties:
-      error:
-        example: internal server error
         type: string
     type: object
   models.RefreshRequest:
@@ -36,6 +30,12 @@ definitions:
         type: string
       refresh_token:
         example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        type: string
+    type: object
+  models.ServerErrorResponse:
+    properties:
+      error:
+        example: internal server error
         type: string
     type: object
 info:
@@ -63,11 +63,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse400'
+            $ref: '#/definitions/models.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse500'
+            $ref: '#/definitions/models.ServerErrorResponse'
       summary: Generate pair of access and refresh tokens by GUID and email
       tags:
       - auth
@@ -95,11 +95,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse400'
+            $ref: '#/definitions/models.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse500'
+            $ref: '#/definitions/models.ServerErrorResponse'
       summary: Get a new pair of access and refresh tokens
       tags:
       - auth

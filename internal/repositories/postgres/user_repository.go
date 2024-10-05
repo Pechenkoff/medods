@@ -19,15 +19,10 @@ func NewUserRepository(db *pgx.Conn) repositories.UserRepository {
 	}
 }
 
-// StroreRefreshToken - create a new user token and save it in PostgreSQL
-func (r *userRepository) StoreRefreshToken(userID, ip, refreshToken, email string) error {
-	hashedToken, err := bcrypt.GenerateFromPassword([]byte(refreshToken), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-
+// StoreRefreshToken - create a new user token and save it in PostgreSQL
+func (r *userRepository) StoreRefreshToken(userID, ip, email string, hashedToken []byte) error {
 	query := `INSERT INTO users (id, email, hashed_token, ip) VALUES ($1, $2, $3, $4)`
-	_, err = r.db.Exec(context.Background(), query, userID, email, hashedToken, ip)
+	_, err := r.db.Exec(context.Background(), query, userID, email, hashedToken, ip)
 	if err != nil {
 		return nil
 	}

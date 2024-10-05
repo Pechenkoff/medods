@@ -20,8 +20,8 @@ type UserClaims struct {
 }
 
 type EmailRequest struct {
-	From    string `json:"from"`
-	To      string `json:"to"`
-	Subject string `json:"subject"`
-	Body    string `json:"body"`
+	Sender    string `json:"from"`
+	Recipient string `json:"to"`
+	Subject   string `json:"subject"`
+	Body      string `json:"body"`
 }

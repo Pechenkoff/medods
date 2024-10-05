@@ -9,61 +9,22 @@ type UserRepository struct {
 	mock.Mock
 }
 
-type UserRepository_Expecter struct {
-	mock *mock.Mock
-}
-
-func (_m *UserRepository) EXPECT() *UserRepository_Expecter {
-	return &UserRepository_Expecter{mock: &_m.Mock}
-}
-
-// StoreRefreshToken provides a mock function with given fields: userID, refreshToken, ip, email
-func (_m *UserRepository) StoreRefreshToken(userID string, refreshToken string, ip string, email string) error {
-	ret := _m.Called(userID, refreshToken, ip, email)
+// StoreRefreshToken provides a mock function with given fields: userID, ip, email, hashedToken
+func (_m *UserRepository) StoreRefreshToken(userID string, ip string, email string, hashedToken []byte) error {
+	ret := _m.Called(userID, ip, email, hashedToken)
 
 	if len(ret) == 0 {
 		panic("no return value specified for StoreRefreshToken")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string, string, string) error); ok {
-		r0 = rf(userID, refreshToken, ip, email)
+	if rf, ok := ret.Get(0).(func(string, string, string, []byte) error); ok {
+		r0 = rf(userID, ip, email, hashedToken)
 	} else {
 		r0 = ret.Error(0)
 	}
 
 	return r0
-}
-
-// UserRepository_StoreRefreshToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'StoreRefreshToken'
-type UserRepository_StoreRefreshToken_Call struct {
-	*mock.Call
-}
-
-// StoreRefreshToken is a helper method to define mock.On call
-//   - userID string
-//   - refreshToken string
-//   - ip string
-//   - email string
-func (_e *UserRepository_Expecter) StoreRefreshToken(userID interface{}, refreshToken interface{}, ip interface{}, email interface{}) *UserRepository_StoreRefreshToken_Call {
-	return &UserRepository_StoreRefreshToken_Call{Call: _e.mock.On("StoreRefreshToken", userID, refreshToken, ip, email)}
-}
-
-func (_c *UserRepository_StoreRefreshToken_Call) Run(run func(userID string, refreshToken string, ip string, email string)) *UserRepository_StoreRefreshToken_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(string), args[2].(string), args[3].(string))
-	})
-	return _c
-}
-
-func (_c *UserRepository_StoreRefreshToken_Call) Return(_a0 error) *UserRepository_StoreRefreshToken_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *UserRepository_StoreRefreshToken_Call) RunAndReturn(run func(string, string, string, string) error) *UserRepository_StoreRefreshToken_Call {
-	_c.Call.Return(run)
-	return _c
 }
 
 // VerifyIP provides a mock function with given fields: userID, ip
@@ -101,35 +62,6 @@ func (_m *UserRepository) VerifyIP(userID string, ip string) (bool, string, erro
 	return r0, r1, r2
 }
 
-// UserRepository_VerifyIP_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'VerifyIP'
-type UserRepository_VerifyIP_Call struct {
-	*mock.Call
-}
-
-// VerifyIP is a helper method to define mock.On call
-//   - userID string
-//   - ip string
-func (_e *UserRepository_Expecter) VerifyIP(userID interface{}, ip interface{}) *UserRepository_VerifyIP_Call {
-	return &UserRepository_VerifyIP_Call{Call: _e.mock.On("VerifyIP", userID, ip)}
-}
-
-func (_c *UserRepository_VerifyIP_Call) Run(run func(userID string, ip string)) *UserRepository_VerifyIP_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *UserRepository_VerifyIP_Call) Return(_a0 bool, _a1 string, _a2 error) *UserRepository_VerifyIP_Call {
-	_c.Call.Return(_a0, _a1, _a2)
-	return _c
-}
-
-func (_c *UserRepository_VerifyIP_Call) RunAndReturn(run func(string, string) (bool, string, error)) *UserRepository_VerifyIP_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // VerifyRefreshToken provides a mock function with given fields: userID, refreshToken
 func (_m *UserRepository) VerifyRefreshToken(userID string, refreshToken string) (bool, error) {
 	ret := _m.Called(userID, refreshToken)
@@ -156,35 +88,6 @@ func (_m *UserRepository) VerifyRefreshToken(userID string, refreshToken string)
 	}
 
 	return r0, r1
-}
-
-// UserRepository_VerifyRefreshToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'VerifyRefreshToken'
-type UserRepository_VerifyRefreshToken_Call struct {
-	*mock.Call
-}
-
-// VerifyRefreshToken is a helper method to define mock.On call
-//   - userID string
-//   - refreshToken string
-func (_e *UserRepository_Expecter) VerifyRefreshToken(userID interface{}, refreshToken interface{}) *UserRepository_VerifyRefreshToken_Call {
-	return &UserRepository_VerifyRefreshToken_Call{Call: _e.mock.On("VerifyRefreshToken", userID, refreshToken)}
-}
-
-func (_c *UserRepository_VerifyRefreshToken_Call) Run(run func(userID string, refreshToken string)) *UserRepository_VerifyRefreshToken_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *UserRepository_VerifyRefreshToken_Call) Return(_a0 bool, _a1 error) *UserRepository_VerifyRefreshToken_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *UserRepository_VerifyRefreshToken_Call) RunAndReturn(run func(string, string) (bool, error)) *UserRepository_VerifyRefreshToken_Call {
-	_c.Call.Return(run)
-	return _c
 }
 
 // NewUserRepository creates a new instance of UserRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

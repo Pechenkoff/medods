@@ -21,7 +21,7 @@ type authHandlers struct {
 // AuthHandlers - interface, which realize our API
 type AuthHandlers interface {
 	AccessHandler(ctx *gin.Context)
-	RefreshHanadler(ctx *gin.Context)
+	RefreshHandler(ctx *gin.Context)
 }
 
 // NewAuthHandlers - create a new copy of AuthHandlers interface
@@ -40,8 +40,8 @@ func NewAuthHandlers(logger *slog.Logger, services services.AuthService) AuthHan
 // @Produce json
 // @Param body body models.AccessRequest true "Body of request with GUID and email"
 // @Success 200 {object} models.Response
-// @Failure 400 {object} models.ErrorResponse400
-// @Failure 500 {object} models.ErrorResponse500
+// @Failure 400 {object} models.BadRequestResponse
+// @Failure 500 {object} models.ServerErrorResponse
 // @Router /access [post]
 func (h *authHandlers) AccessHandler(ctx *gin.Context) {
 	var req models.AccessRequest
@@ -77,7 +77,7 @@ func (h *authHandlers) AccessHandler(ctx *gin.Context) {
 		RefreshToken: pairToken.RefreshToken,
 	}
 
-	ctx.JSON(http.StatusOK, response)
+	ctx.JSON(http.StatusCreated, response)
 }
 
 // RefreshHandler godoc
@@ -88,10 +88,10 @@ func (h *authHandlers) AccessHandler(ctx *gin.Context) {
 // @Produce json
 // @Param body body models.RefreshRequest true "Body request with access and refresh token"
 // @Success 200 {object} models.Response
-// @Failure 400 {object} models.ErrorResponse400
-// @Failure 500 {object} models.ErrorResponse500
+// @Failure 400 {object} models.BadRequestResponse
+// @Failure 500 {object} models.ServerErrorResponse
 // @Router /refresh [post]
-func (h *authHandlers) RefreshHanadler(ctx *gin.Context) {
+func (h *authHandlers) RefreshHandler(ctx *gin.Context) {
 	var req models.RefreshRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		h.logger.Error("failed to bind request", sl.Err(err))
@@ -125,5 +125,5 @@ func (h *authHandlers) RefreshHanadler(ctx *gin.Context) {
 		RefreshToken: pairToken.RefreshToken,
 	}
 
-	ctx.JSON(http.StatusOK, responce)
+	ctx.JSON(http.StatusCreated, responce)
 }

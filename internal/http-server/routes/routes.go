@@ -30,7 +30,7 @@ func (r *Router) SetupRouter(handlers handlers.AuthHandlers) {
 	}))
 
 	r.Engine.POST("/access", handlers.AccessHandler)
-	r.Engine.POST("/refresh", handlers.RefreshHanadler)
+	r.Engine.POST("/refresh", handlers.RefreshHandler)
 
 	r.Engine.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "not found"})

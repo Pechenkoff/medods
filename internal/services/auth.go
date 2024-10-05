@@ -9,6 +9,7 @@ import (
 	"medods/internal/utils"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Message - structure of message to kafka
@@ -48,7 +49,11 @@ func (s *authService) GenerateTokens(userID, ipAddress, email string) (*entities
 	}
 
 	refreshToken := uuid.New().String()
-	err = s.userRepo.StoreRefreshToken(userID, refreshToken, ipAddress, email)
+	hashedToken, err := bcrypt.GenerateFromPassword([]byte(refreshToken), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+	err = s.userRepo.StoreRefreshToken(userID, ipAddress, email, hashedToken)
 	if err != nil {
 		return nil, err
 	}
@@ -60,8 +65,8 @@ func (s *authService) GenerateTokens(userID, ipAddress, email string) (*entities
 }
 
 // RefreshTokens - realise a refresh operation
-func (s *authService) RefreshTokens(acccessToken, refreshToken, userIP string) (*entities.TokenPair, error) {
-	userClaims, err := s.jwtUtils.ParseJWT(acccessToken)
+func (s *authService) RefreshTokens(accessToken, refreshToken, userIP string) (*entities.TokenPair, error) {
+	userClaims, err := s.jwtUtils.ParseJWT(accessToken)
 	if err != nil {
 		return nil, err
 	}

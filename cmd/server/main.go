@@ -6,14 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"medods/internal/config"
-	"medods/internal/http-server/handlers"
-	"medods/internal/http-server/routes"
-	kafka "medods/internal/infrustructure/kafka/producer"
-	"medods/internal/infrustructure/logger/handlers/slogpretty"
-	"medods/internal/infrustructure/logger/sl"
-	"medods/internal/repositories/postgres"
-	"medods/internal/services"
-	"medods/internal/utils"
+
 	"net/http"
 	"os"
 	"os/signal"
@@ -22,11 +15,19 @@ import (
 
 	"github.com/IBM/sarama"
 	"github.com/jackc/pgx/v5"
+	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	_ "medods/docs"
 
-	swaggerFiles "github.com/swaggo/files"
+	"medods/internal/http-server/handlers"
+	"medods/internal/http-server/routes"
+	kafka "medods/internal/infrustructure/kafka/producer"
+	"medods/internal/infrustructure/logger/handlers/slogpretty"
+	"medods/internal/infrustructure/logger/sl"
+	"medods/internal/repositories/postgres"
+	"medods/internal/services"
+	"medods/internal/utils"
 )
 
 // go run ./cmd/server/main.go -config=./config/config.yaml -migration=file://./db/migrations
@@ -36,7 +37,7 @@ func main() {
 	migrationPath := flag.String("migration", "file://db/migrations", "Path to the migration directory")
 	flag.Parse()
 
-	// read configuration fila
+	// read configuration files
 	cfg := config.MustLoadConfig(*configPath)
 
 	// create logger
@@ -61,8 +62,8 @@ func main() {
 
 	producer, err := kafka.NewKafkaProducer([]string{cfg.Kafka.Providers}, config)
 	if err != nil {
-		logger.Error("failed create kafka producer", sl.Err(err))
-		panic("failed create kafka producer")
+		logger.Error("failed to create kafka producer", sl.Err(err))
+		panic("failed to create kafka producer")
 	}
 
 	//create a copy of jwt utils

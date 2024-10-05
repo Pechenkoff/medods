@@ -133,7 +133,7 @@ func TestRefreshHandler(t *testing.T) {
 			handler := handlers.NewAuthHandlers(slogdiscard.NewDiscardLogger(), mockService)
 
 			router := gin.New()
-			router.POST("/refresh", handler.RefreshHanadler)
+			router.POST("/refresh", handler.RefreshHandler)
 
 			jsonBody, _ := json.Marshal(tt.body)
 			req, _ := http.NewRequest(http.MethodPost, "/refresh", bytes.NewBuffer(jsonBody))
